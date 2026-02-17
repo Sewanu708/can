@@ -1,0 +1,59 @@
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.panel__top {
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.editor-row {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.panel__left {
+  width: 260px;
+  border-right: 1px solid #e5e7eb;
+  background: #fff;
+  overflow-y: auto;
+}
+
+.editor-canvas {
+  flex: 1;
+  background: #f3f4f6;
+  position: relative;
+}
+
+.panel__right {
+  width: 300px;
+  border-left: 1px solid #e5e7eb;
+  background: #fff;
+  overflow-y: auto;
+}
+
+.gjs-blocks-c {
+  padding: 12px;
+}
+
+.gjs-block {
+  width: 100%;
+  min-height: auto;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  margin-bottom: 8px;
+}
+
+.gjs-block-label {
+  display: none !important;
+}
