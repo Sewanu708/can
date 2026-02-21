@@ -22,9 +22,14 @@ function Canvas() {
     layout: true,
     blocks: true,
   });
+  const [device, setDevice] = useState<"desktop" | "tablet" | "mobile">(
+    "desktop",
+  );
 
   // --- NEW STATE FOR RIGHT PANEL TABS ---
-  const [activeRightTab, setActiveRightTab] = useState<"styles" | "ai">("styles");
+  const [activeRightTab, setActiveRightTab] = useState<"styles" | "ai">(
+    "styles",
+  );
 
   // --- NEW STATE FOR MODAL ---
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false);
@@ -38,12 +43,23 @@ function Canvas() {
     }));
   };
 
+  const handleDeviceChange = (device: "desktop" | "tablet" | "mobile") => {
+    setDevice(device);
+  };
+
   const handleSave = () => {
     if (editor) {
-      const html = editor.getHtml();
-      const css = editor.getCss();
-      console.log({ html, css });
-      alert("Saved! Check console for HTML/CSS.");
+      // Try to get inlined HTML (requires grapesjs-preset-newsletter or similar)
+      const inlinedHtml = editor.runCommand("gjs-get-inlined-html");
+
+      if (inlinedHtml) {
+        console.log(inlinedHtml);
+      } else {
+        const html = editor.getHtml();
+        const css = editor.getCss();
+        console.log(`<style>${css}</style>${html}`);
+      }
+      alert("Saved! Check console for HTML.");
     }
   };
 
@@ -71,6 +87,30 @@ function Canvas() {
     close_asset_manager();
   };
   // ----------------------------
+
+  // --- EFFECT: HANDLE DEVICE SWITCHING ---
+  useEffect(() => {
+    if (!editor) return;
+
+    const iframe = editor.Canvas.getFrameEl();
+    const doc = iframe?.contentDocument;
+
+    if (doc && doc.body) {
+      doc.body.style.transition =
+        "width 0.3s ease-in-out, margin 0.3s ease-in-out";
+
+      if (device === "mobile") {
+        doc.body.style.width = "375px";
+        doc.body.style.margin = "0 auto";
+      } else if (device === "tablet") {
+        doc.body.style.width = "768px";
+        doc.body.style.margin = "0 auto";
+      } else {
+        doc.body.style.width = "100%";
+        doc.body.style.margin = "0";
+      }
+    }
+  }, [editor, device]);
 
   useEffect(() => {
     const customBlockManager = (editor: any) => {
@@ -225,17 +265,27 @@ function Canvas() {
       },
       // -------------------------------------
 
-      canvas: {
-        styles: [
-          `body { background-color: #f3f4f6; padding: 20px; margin: 0; }`,
-        ],
-      },
+      // canvas: {
+      //   styles: [
+      //     `body { background-color: #f3f4f6; padding: 20px; margin: 0; }`,
+      //   ],
+      // },
 
       height: "100%",
       width: "100%",
       storageManager: false,
 
       panels: { defaults: [] },
+      canvas: {
+        styles: [
+          `body {
+             background-color: #f3f4f6;
+             padding: 20px;
+             margin: 0;
+             transition: width 0.3s ease-in-out;
+           }`,
+        ],
+      },
     });
 
     // --- NEW EVENT LISTENERS ---
@@ -329,6 +379,43 @@ function Canvas() {
           doc.head.appendChild(style);
         }
       });
+
+      // --- AI ASSISTANT TOOLBAR INTEGRATION ---
+      editor.Commands.add("tlb-ai-edit", {
+        run(editor, sender) {
+          setActiveRightTab("ai");
+          editor.stopCommand("tlb-ai-edit");
+        },
+      });
+
+      editor.on("component:selected", (component) => {
+        const toolbar = component.get("toolbar");
+        const aiCommand = "tlb-ai-edit";
+
+        if (toolbar && toolbar.some((t: any) => t.command === aiCommand)) {
+          return;
+        }
+
+        const sparkleIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M9 3v4"/><path d="M3 5h4"/><path d="M3 9h4"/></svg>`;
+
+        const aiButton = {
+          command: aiCommand,
+          label: sparkleIcon,
+          attributes: { title: "Edit with AI" },
+        };
+
+        const defaultToolbar = [
+          { attributes: { class: "fa fa-arrows" }, command: "tlb-move" },
+          { attributes: { class: "fa fa-clone" }, command: "tlb-clone" },
+          { attributes: { class: "fa fa-trash-o" }, command: "tlb-delete" },
+        ];
+
+        const currentToolbar = Array.isArray(toolbar)
+          ? toolbar
+          : defaultToolbar;
+        component.set("toolbar", [aiButton, ...currentToolbar]);
+      });
+      // ----------------------------------------
     }
   }, [editor]);
 
@@ -343,8 +430,41 @@ function Canvas() {
       {/* ---------------------------------- */}
 
       {/* Top Toolbar */}
-      <div className="panel__top">
-        <div className="panel__basic-actions">
+      <div className="panel__top flex items-center justify-between px-4 py-2">
+        {/* LEFT — Logo placeholder */}
+        <div className="flex items-center gap-2 w-48">
+          <div className="w-8 h-8 rounded-md bg-blue-600 flex items-center justify-center">
+            <span className="text-white font-bold text-sm">✦</span>
+          </div>
+          <span className="text-sm font-semibold text-gray-700 tracking-tight">
+            MyEditor
+          </span>
+        </div>
+
+        {/* CENTER — Device toggles */}
+        <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-lg">
+          <button
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${device === "desktop" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+            onClick={() => handleDeviceChange("desktop")}
+          >
+            Desktop
+          </button>
+          <button
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${device === "tablet" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+            onClick={() => handleDeviceChange("tablet")}
+          >
+            Tablet
+          </button>
+          <button
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${device === "mobile" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+            onClick={() => handleDeviceChange("mobile")}
+          >
+            Mobile
+          </button>
+        </div>
+
+        {/* RIGHT — Save button */}
+        <div className="flex items-center justify-end w-48">
           <button
             className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
             onClick={handleSave}
@@ -353,7 +473,6 @@ function Canvas() {
           </button>
         </div>
       </div>
-
       {/* Main Editor Row */}
       <div className="editor-row flex flex-1 overflow-hidden">
         {/* LEFT — Block Manager */}
@@ -409,14 +528,14 @@ function Canvas() {
           {/* Right Panel Tabs */}
           <div className="flex border-b border-gray-200">
             <button
-              className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeRightTab === 'styles' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-              onClick={() => setActiveRightTab('styles')}
+              className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeRightTab === "styles" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+              onClick={() => setActiveRightTab("styles")}
             >
               <Paintbrush size={16} /> Styles
             </button>
             <button
-              className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeRightTab === 'ai' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-              onClick={() => setActiveRightTab('ai')}
+              className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeRightTab === "ai" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+              onClick={() => setActiveRightTab("ai")}
             >
               <Sparkles size={16} /> AI Assistant
             </button>
@@ -424,9 +543,12 @@ function Canvas() {
 
           {/* Tab Content */}
           <div className="flex-1 overflow-hidden relative">
-            <div id="settings" className={`h-full overflow-y-auto ${activeRightTab === 'styles' ? 'block' : 'hidden'}`}></div>
-            
-            {activeRightTab === 'ai' && <EditorAssistant editor={editor} />}
+            <div
+              id="settings"
+              className={`h-full overflow-y-auto ${activeRightTab === "styles" ? "block" : "hidden"}`}
+            ></div>
+
+            {activeRightTab === "ai" && <EditorAssistant editor={editor} />}
           </div>
         </div>
       </div>
