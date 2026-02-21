@@ -14,6 +14,20 @@
   padding: 0 16px;
 }
 
+ /* #gjs {
+  height: 100%;
+  width: 100%;
+}
+
+.editor-canvas {
+  flex: 1;
+  background: #f3f4f6;
+  position: relative;
+  min-width: 0;
+}  */
+
+
+
 .editor-row {
   display: flex;
   flex: 1;
@@ -25,6 +39,7 @@
   border-right: 1px solid #e5e7eb;
   background: #fff;
   overflow-y: auto;
+  position: relative;
 }
 
 .editor-canvas {
@@ -38,6 +53,7 @@
   border-left: 1px solid #e5e7eb;
   background: #fff;
   overflow-y: auto;
+  position: relative;
 }
 
 .gjs-blocks-c {
@@ -57,3 +73,240 @@
 .gjs-block-label {
   display: none !important;
 }
+
+/* Custom GrapesJS Style Manager Styling */
+.gjs-sm-sector {
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0;
+}
+
+.gjs-sm-title {
+  background-color: #f9fafb;
+  color: #111827;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gjs-sm-title:hover {
+  background-color: #f3f4f6;
+}
+
+.gjs-sm-icon {
+  color: #6b7280;
+}
+
+.gjs-sm-properties {
+  padding: 8px 12px;
+  background-color: #ffffff;
+}
+
+.gjs-sm-property {
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gjs-sm-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #4b5563;
+  width: 100%;
+}
+
+#settings .gjs-field {
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: #1f2937;
+}
+
+#settings .gjs-field:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+#settings .gjs-field input,
+#settings .gjs-field select {
+  color: #1f2937;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+
+.gjs-sm-sectors{
+  background: #ffffff;
+  color: #111827;
+}
+
+.gjs-editor{
+  
+}
+
+/* Fix Color Picker & Spectrum Styling */
+.sp-container {
+  background-color: #fff !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  border-radius: 0.5rem !important;
+  font-family: inherit !important;
+  z-index: 100 !important;
+}
+
+.sp-picker-container {
+  border-left: none !important;
+}
+
+.gjs-editor-sp {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Fix Canvas Alignment */
+.gjs-cv-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* Custom GrapesJS Modal (Asset Manager) Styling */
+.gjs-mdl-container {
+  z-index: 9999 !important;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.gjs-mdl-dialog {
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+}
+
+.gjs-mdl-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.gjs-mdl-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.gjs-mdl-btn-close {
+  color: #6b7280;
+}
+
+.gjs-mdl-content {
+  padding: 1rem;
+}
+
+.gjs-am-file-uploader {
+  background-color: #f9fafb;
+  border: 2px dashed #e5e7eb;
+}
+
+.gjs-am-assets-cont {
+  background-color: #fff;
+}
+
+
+.personalization-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    width: 350px;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+    z-index: 10000;
+    margin-top: 4px;
+}
+
+.personalization-dropdown-header {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .personalization-search {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .personalization-search:focus {
+    border-color: #007BFF;
+  }
+
+  .personalization-dropdown-body {
+    overflow-y: auto;
+    max-height: 340px;
+  }
+
+  .personalization-group {
+    padding: 8px 0;
+  }
+
+  .personalization-group-label {
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .personalization-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+
+  .personalization-option:hover {
+    background-color: #f5f5f5;
+  }
+
+  .personalization-option-label {
+    font-size: 14px;
+    color: #333;
+  }
+
+  .personalization-option-value {
+    font-family: monospace;
+    font-size: 12px;
+    color: #666;
+    background-color: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* RTE Toolbar button styling */
+  .personalization-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .personalization-btn svg {
+    width: 16px;
+    height: 16px;
+  }
