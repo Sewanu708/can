@@ -64,6 +64,7 @@ export function AssetManagerModal({
                     name: uploadedFile.name,
                     url: uploadedFile.url,
                     key: uploadedFile.key,
+                    // base64:uploadedFile.base64
                   };
 
                   // Add to local storage

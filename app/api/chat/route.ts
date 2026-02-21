@@ -37,7 +37,7 @@ You are an expert Email Marketing Designer and GrapesJS Architect.
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
-    
+
     // Initialize Gemini Client
     const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
@@ -45,12 +45,14 @@ export async function POST(req: Request) {
     const contents = await Promise.all(
       messages.map(async (msg: any) => {
         const role = msg.role === "user" ? "user" : "model";
-        
+
         let textContent = msg.content;
 
         // If images exist, append them to text content so Gemini knows the URLs for HTML generation
+
         if (msg.images && Array.isArray(msg.images) && msg.images.length > 0) {
-          textContent += '\'n\n[AVAILABLE IMAGES]:\n\${msg.images.join("\\n")}\''
+          const imageList = msg.images.map((img: any) => img).join("\n");
+          textContent += `\n\n[AVAILABLE IMAGES]:\n${imageList}`;
         }
 
         // Start with text part
@@ -58,14 +60,18 @@ export async function POST(req: Request) {
 
         // If images exist, fetch and convert to base64
         if (msg.images && Array.isArray(msg.images)) {
+          const imageSet = new Set();
           for (const imageUrl of msg.images) {
             try {
+              if (imageSet.has(imageUrl)) continue;
+              imageSet.add(imageUrl);
               const imageResponse = await fetch(imageUrl);
               if (!imageResponse.ok) continue;
-              
+
               const arrayBuffer = await imageResponse.arrayBuffer();
               const base64Image = Buffer.from(arrayBuffer).toString("base64");
-              const mimeType = imageResponse.headers.get("content-type") || "image/jpeg";
+              const mimeType =
+                imageResponse.headers.get("content-type") || "image/jpeg";
 
               parts.push({
                 inlineData: {
@@ -80,7 +86,7 @@ export async function POST(req: Request) {
         }
 
         return { role, parts };
-      })
+      }),
     );
 
     const result = await ai.models.generateContent({
@@ -99,7 +105,7 @@ export async function POST(req: Request) {
     console.error("Chat API Error:", error);
     return NextResponse.json(
       { error: error.message || "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
